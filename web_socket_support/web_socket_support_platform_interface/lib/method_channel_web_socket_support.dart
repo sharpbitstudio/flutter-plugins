@@ -24,15 +24,17 @@ class MethodChannelWebSocketSupport extends WebSocketSupportPlatform {
         ),
         _byteMessages = EventChannel(
           'tech.sharpbitstudio.web_socket_support/binary-messages',
-        ),
-        super(_listener);
+        );
 
   /// This constructor is only used for testing and shouldn't be accessed by
   /// users of the plugin. It may break or change at any time.
   @visibleForTesting
   MethodChannelWebSocketSupport.private(this._listener, this._methodChannel,
-      this._textMessages, this._byteMessages)
-      : super(_listener);
+      this._textMessages, this._byteMessages);
+
+  /// obtain WebSocketListener implementation
+  @visibleForTesting
+  WebSocketListener get listener => _listener;
 
   @override
   Future<void> connect(

@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:meta/meta.dart' show required;
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'package:web_socket_support_platform_interface/method_channel_web_socket_support.dart';
+import 'package:web_socket_support_platform_interface/web_socket_connection.dart';
 import 'package:web_socket_support_platform_interface/web_socket_listener.dart';
 import 'package:web_socket_support_platform_interface/web_socket_options.dart';
 
@@ -15,13 +17,15 @@ import 'package:web_socket_support_platform_interface/web_socket_options.dart';
 /// [WebSocketSupportPlatform] methods.
 class WebSocketSupportPlatform extends PlatformInterface {
   ///
-  /// Constructs a WebSocketSupportPlatform with [WebSocketListener].
-  WebSocketSupportPlatform(WebSocketListener listener) : super(token: _token);
+  /// Constructs a WebSocketSupportPlatform.
+  WebSocketSupportPlatform() : super(token: _token);
 
   static final Object _token = Object();
 
+  /// Default instance uses DummyListener so concrete platform implementation
+  /// must set correct instance or client code will be useless.
   static WebSocketSupportPlatform _instance =
-      MethodChannelWebSocketSupport(DefaultWebSocketListener());
+      MethodChannelWebSocketSupport(DummyWebSocketListener._());
 
   /// The default instance of [WebSocketSupportPlatform] to use.
   ///
@@ -47,5 +51,43 @@ class WebSocketSupportPlatform extends PlatformInterface {
   /// When connection is successfully closed, [onWsClosed] will be invoked.
   Future<void> disconnect() {
     throw UnimplementedError('disconnect() has not been implemented.');
+  }
+}
+
+/// This is Dummy WebSocketListener implementation which only logs events
+/// received from underlying platform WebSocket. It's really useless :-S
+class DummyWebSocketListener extends WebSocketListener {
+  /// Prevent outside instantiation/extension
+  /// (but unfortunately it can be implemented anyway..)
+  DummyWebSocketListener._();
+
+  @override
+  void onByteMessage(Uint8List message) {
+    print('Byte message received. Size: ${message.length}');
+  }
+
+  @override
+  void onError(Exception exception) {
+    print('Platform exception occurred: $exception');
+  }
+
+  @override
+  void onTextMessage(String message) {
+    print('Text message received. Content: $message');
+  }
+
+  @override
+  void onWsClosed(int code, String reason) {
+    print('WebSocket connection closed. Code:$code, Reason:$reason:');
+  }
+
+  @override
+  void onWsClosing(int code, String reason) {
+    print('WebSocket connection is closing. Code:$code, Reason:$reason:');
+  }
+
+  @override
+  void onWsOpened(WebSocketConnection webSocketConnection) {
+    print('WebSocket connection opened. Ws:$webSocketConnection');
   }
 }
