@@ -115,7 +115,11 @@ public class WebSocketClient extends WebSocketListener {
    */
   public void disconnect() {
     autoReconnect = false;
-    webSocket.close(1000, "Client done.");
+    if (webSocket != null) {
+      webSocket.close(1000, "Client done.");
+    } else {
+      Log.w(TAG, "WebSocket was null on disconnect.");
+    }
   }
 
   /**
