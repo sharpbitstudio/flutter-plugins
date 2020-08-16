@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
 import 'package:meta/meta.dart';
+import 'package:web_socket_support_platform_interface/web_scoket_exception.dart';
 import 'package:web_socket_support_platform_interface/web_socket_connection.dart';
 import 'package:web_socket_support_platform_interface/web_socket_listener.dart';
 import 'package:web_socket_support_platform_interface/web_socket_options.dart';
@@ -54,6 +55,11 @@ class MethodChannelWebSocketSupport extends WebSocketSupportPlatform {
         case 'onClosed':
           var args = call.arguments as Map;
           _listener.onWsClosed(args['code'], args['reason']);
+          break;
+        case 'onFailure':
+          var args = call.arguments as Map;
+          _listener.onError(WebSocketException(args['throwableType'],
+              args['errorMessage'], args['causeMessage']));
           break;
         default:
           print('Unexpected method name: ${call.method}');
