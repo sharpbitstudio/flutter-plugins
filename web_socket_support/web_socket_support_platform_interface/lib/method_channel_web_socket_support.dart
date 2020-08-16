@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
 import 'package:meta/meta.dart';
+import 'package:web_socket_support_platform_interface/web_scoket_exception.dart';
 import 'package:web_socket_support_platform_interface/web_socket_connection.dart';
 import 'package:web_socket_support_platform_interface/web_socket_listener.dart';
 import 'package:web_socket_support_platform_interface/web_socket_options.dart';
@@ -24,15 +25,17 @@ class MethodChannelWebSocketSupport extends WebSocketSupportPlatform {
         ),
         _byteMessages = EventChannel(
           'tech.sharpbitstudio.web_socket_support/binary-messages',
-        ),
-        super(_listener);
+        );
 
   /// This constructor is only used for testing and shouldn't be accessed by
   /// users of the plugin. It may break or change at any time.
   @visibleForTesting
   MethodChannelWebSocketSupport.private(this._listener, this._methodChannel,
-      this._textMessages, this._byteMessages)
-      : super(_listener);
+      this._textMessages, this._byteMessages);
+
+  /// obtain WebSocketListener implementation
+  @visibleForTesting
+  WebSocketListener get listener => _listener;
 
   @override
   Future<void> connect(
@@ -52,6 +55,11 @@ class MethodChannelWebSocketSupport extends WebSocketSupportPlatform {
         case 'onClosed':
           var args = call.arguments as Map;
           _listener.onWsClosed(args['code'], args['reason']);
+          break;
+        case 'onFailure':
+          var args = call.arguments as Map;
+          _listener.onError(WebSocketException(args['throwableType'],
+              args['errorMessage'], args['causeMessage']));
           break;
         default:
           print('Unexpected method name: ${call.method}');

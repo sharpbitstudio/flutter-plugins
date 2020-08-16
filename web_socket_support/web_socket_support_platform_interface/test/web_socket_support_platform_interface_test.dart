@@ -34,7 +34,7 @@ void main() {
 
     test('Can be extended', () {
       WebSocketSupportPlatform.instance =
-          ExtendsWebSocketSupportPlatform(DefaultWebSocketListener());
+          ExtendsWebSocketSupportPlatform(TestWebSocketListener());
     });
   });
 
@@ -63,7 +63,7 @@ void main() {
       _byteMessages = MockEventChannel();
 
       _webSocketSupport = MethodChannelWebSocketSupport.private(
-          DefaultWebSocketListener(),
+          TestWebSocketListener(),
           _methodChannel,
           _textMessages,
           _byteMessages);
@@ -197,21 +197,6 @@ void main() {
       verify(byteMessages.receiveBroadcastStream()).called(1);
     });
 
-    test('onWsOpen', () async {
-      // connect
-      await _webSocketSupport.connect(
-        'ws://example.com/',
-        options: WebSocketOptions(),
-      );
-      textMessagesController.add('test-text-message');
-
-      // verify
-      expect(
-          await _testWebSocketListener.textQueue.next
-              .timeout(Duration(seconds: 1)),
-          'test-text-message');
-    });
-
     test('onOpened', () async {
       // connect
       await _webSocketSupport.connect(
@@ -254,6 +239,21 @@ void main() {
       expect(_testWebSocketListener.closingReason, 'testReason2');
     });
 
+    test('onTextMessage', () async {
+      // connect
+      await _webSocketSupport.connect(
+        'ws://example.com/',
+        options: WebSocketOptions(),
+      );
+      textMessagesController.add('test-text-message');
+
+      // verify
+      expect(
+          await _testWebSocketListener.textQueue.next
+              .timeout(Duration(seconds: 1)),
+          'test-text-message');
+    });
+
     test('onByteMessage', () async {
       // connect
       await _webSocketSupport.connect(
@@ -280,7 +280,7 @@ class ImplementsWebSocketSupportPlatform extends Mock
     implements WebSocketSupportPlatform {}
 
 class ExtendsWebSocketSupportPlatform extends WebSocketSupportPlatform {
-  ExtendsWebSocketSupportPlatform(WebSocketListener listener) : super(listener);
+  ExtendsWebSocketSupportPlatform(WebSocketListener listener);
 }
 
 class MockMethodChannel extends Mock implements MethodChannel {}

@@ -30,35 +30,3 @@ abstract class WebSocketListener {
   /// Invoked when error occurs in transport between dart and platform.
   void onError(Exception exception);
 }
-
-class DefaultWebSocketListener extends WebSocketListener {
-  @override
-  void onByteMessage(Uint8List message) {
-    print('Byte message received. Size: ${message.length}');
-  }
-
-  @override
-  void onError(Exception exception) {
-    print('Platform exception occurred: $exception');
-  }
-
-  @override
-  void onTextMessage(String message) {
-    print('Text message received. Content: $message');
-  }
-
-  @override
-  void onWsClosed(int code, String reason) {
-    print('WebSocket connection closed. Code:$code, Reason:$reason:');
-  }
-
-  @override
-  void onWsClosing(int code, String reason) {
-    print('WebSocket connection is closing. Code:$code, Reason:$reason:');
-  }
-
-  @override
-  void onWsOpened(WebSocketConnection webSocketConnection) {
-    print('WebSocket connection opened. Ws:$webSocketConnection');
-  }
-}

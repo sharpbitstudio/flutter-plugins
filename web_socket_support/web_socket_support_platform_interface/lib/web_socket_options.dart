@@ -5,7 +5,7 @@ class WebSocketOptions {
   final int pingInterval;
   final Map<String, String> headers;
 
-  WebSocketOptions({
+  const WebSocketOptions({
     this.autoReconnect = false,
     this.pingInterval = 0,
     this.headers = const {},
