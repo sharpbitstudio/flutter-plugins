@@ -172,7 +172,7 @@ public class PlatformChannelsHandler implements MethodCallHandler {
   private void onByteMessageEvent(ByteString byteMessage) {
     if (byteMessagesEventSink != null) {
       try {
-        byteMessagesEventSink.success(byteMessage);
+        byteMessagesEventSink.success(byteMessage.toByteArray());
       } catch (Exception e) {
         // sending system error should be critical
         Log.e(TAG,
@@ -183,7 +183,7 @@ public class PlatformChannelsHandler implements MethodCallHandler {
     } else {
       // fall back to method call
       Log.i(TAG, "ByteMessagesEventSink was null! Falling back to method call.");
-      methodChannel.invokeMethod(OUT_METHOD_NAME_ON_BYTE_MSG, byteMessage);
+      methodChannel.invokeMethod(OUT_METHOD_NAME_ON_BYTE_MSG, byteMessage.toByteArray());
     }
   }
 

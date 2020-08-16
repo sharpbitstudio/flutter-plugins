@@ -30,7 +30,6 @@ public class WebSocketClient extends WebSocketListener {
   // locals
   private WebSocket webSocket;
   private boolean autoReconnect = false;
-  private boolean connected = false;
   private int delayedConnectAttempt;
 
   // consumers
@@ -57,7 +56,7 @@ public class WebSocketClient extends WebSocketListener {
       @NotNull Consumer<String> textMessageConsumer,
       @NotNull Consumer<ByteString> byteMessageConsumer) {
 
-    if (connected) {
+    if (webSocket != null) {
       Log.w(TAG, "WS Connection still active on new connect attempt. Disconnecting...");
       disconnect(); // call disconnect and wait for onClose
       // schedule next try and return for now...
@@ -85,7 +84,7 @@ public class WebSocketClient extends WebSocketListener {
     client.newWebSocket(request, this);
 
     // done
-    Log.i(TAG, "Request to connect to ws server sent.");
+    Log.i(TAG, "Connection request sent to: " + serverUrl);
   }
 
   private void tryDelayedConnect(String serverUrl, Map<String, Object> options,
@@ -166,7 +165,6 @@ public class WebSocketClient extends WebSocketListener {
   public void onOpen(@NotNull WebSocket webSocket, @NotNull Response response) {
     Log.i(TAG, "WS connected. WebSocket:" + webSocket.toString());
     this.webSocket = webSocket;
-    this.connected = true;
     this.delayedConnectAttempt = 0;
 
     // notify consumers about onOpen event
@@ -196,11 +194,11 @@ public class WebSocketClient extends WebSocketListener {
   }
 
   @Override
-  public void onMessage(@NotNull WebSocket webSocket, @NotNull ByteString bytes) {
-    Log.d(TAG, "Byte message received. size:" + bytes.size());
+  public void onMessage(@NotNull WebSocket webSocket, @NotNull ByteString byteString) {
+    Log.d(TAG, "Byte message received. size:" + byteString.size());
     mainThreadHandler.post(() -> {
       if (byteMessageConsumer != null) {
-        byteMessageConsumer.accept(bytes);
+        byteMessageConsumer.accept(byteString);
       } else {
         // maybe we are not interested in byte messages?
         Log.w(TAG, "Byte message received but no handler for byte messages defined!");
@@ -244,12 +242,23 @@ public class WebSocketClient extends WebSocketListener {
   public void onFailure(@NotNull WebSocket webSocket, @NotNull Throwable t,
       @Nullable Response response) {
     Log.e(TAG, "Error occurred on ws channel. Error:" + t.getMessage());
-    // TODO
+    mainThreadHandler.post(() -> {
+      if (systemConsumer != null) {
+        // notify consumers about onClosed event
+        systemConsumer.accept(SystemEventType.WS_FAILURE,
+            SystemEventContext.builder().throwableType(t.getClass().getSimpleName())
+                .errorMessage(t.getMessage())
+                .causeMessage(t.getCause() != null ? t.getCause().toString() : null).build());
+      } else {
+        Log.wtf(TAG,
+            "WebSocketClient initialized badly [systemConsumer is null]. Closing connection...");
+      }
+      cleanUpOnClose();
+    });
   }
 
   private void cleanUpOnClose() {
     webSocket = null;
-    connected = false;
     // remove consumers
     systemConsumer = null;
     textMessageConsumer = null;

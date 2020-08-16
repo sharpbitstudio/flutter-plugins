@@ -61,7 +61,7 @@ class _MyAppState extends State<MyApp> {
   Future<void> initPlatformState() async {
     // Platform messages may fail, so we use a try/catch PlatformException.
     try {
-      await _wsClient.connect("wss://echo.websocket.org");
+      await _wsClient.connect("ws://echo.websocket.org");
     } on PlatformException catch (e) {
       print('Failed to connect to ws server. Error:$e');
     }

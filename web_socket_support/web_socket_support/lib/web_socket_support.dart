@@ -15,6 +15,8 @@ export 'package:web_socket_support_platform_interface/web_socket_listener.dart'
     show WebSocketListener;
 export 'package:web_socket_support_platform_interface/web_socket_connection.dart'
     show WebSocketConnection;
+export 'package:web_socket_support_platform_interface/web_scoket_exception.dart'
+    show WebSocketException;
 
 class WebSocketClient extends WebSocketSupportPlatform {
   /// constructor

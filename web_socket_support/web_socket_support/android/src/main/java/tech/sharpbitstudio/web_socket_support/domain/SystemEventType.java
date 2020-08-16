@@ -6,7 +6,8 @@ public enum SystemEventType {
 
   WS_OPENED("onOpened"),
   WS_CLOSING("onClosing"),
-  WS_CLOSED("onClosed");
+  WS_CLOSED("onClosed"),
+  WS_FAILURE("onFailure");
 
   @Getter
   private final String methodName;
