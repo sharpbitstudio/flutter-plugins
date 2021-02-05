@@ -1,3 +1,16 @@
+## 0.1.4
+
+* API updated, Added code and reason to disconnect method.
+
+## 0.1.3
+
+* Removed `dart:io` import to support Web platform.
+
+## 0.1.2
+
+* Added support for 'onFailure' web-socket callback.
+* Dependencies update
+
 ## 0.1.1
 
 * Updated homepage in pubspec file.
