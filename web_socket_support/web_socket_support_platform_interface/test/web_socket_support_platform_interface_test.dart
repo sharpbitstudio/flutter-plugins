@@ -123,11 +123,14 @@ void main() {
     });
 
     test('disconnect', () async {
-      await _webSocketSupport.disconnect();
+      await _webSocketSupport.disconnect(code: 3, reason: 'test');
       expect(
         calledMethodsLog,
         <Matcher>[
-          isMethodCall('disconnect', arguments: null),
+          isMethodCall('disconnect', arguments: <String, Object>{
+            'code': 3,
+            'reason': 'test'
+          }),
         ],
       );
     });

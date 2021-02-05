@@ -92,7 +92,13 @@ class MethodChannelWebSocketSupport extends WebSocketSupportPlatform {
   }
 
   @override
-  Future<void> disconnect() {
-    return _methodChannel.invokeMethod('disconnect');
+  Future<void> disconnect({int code = 1000, String reason = 'Client done.'}) {
+    return _methodChannel.invokeMethod<void>(
+      'disconnect',
+      <String, Object>{
+        'code': code,
+        'reason': reason,
+      },
+    );
   }
 }
