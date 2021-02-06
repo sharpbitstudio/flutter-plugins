@@ -1,3 +1,7 @@
+## 0.1.5
+
+* API minor fix.
+
 ## 0.1.4
 
 * API updated, Added code and reason to disconnect method.

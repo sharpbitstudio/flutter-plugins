@@ -49,7 +49,10 @@ class WebSocketSupportPlatform extends PlatformInterface {
 
   /// Initialize ws connection close by client.
   /// When connection is successfully closed, [onWsClosed] will be invoked.
-  Future<void> disconnect() {
+  Future<void> disconnect({
+    int code = 1000,
+    String reason = 'Client done.',
+  }) {
     throw UnimplementedError('disconnect() has not been implemented.');
   }
 }
