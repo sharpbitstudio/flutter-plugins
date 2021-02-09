@@ -5,23 +5,23 @@ dart --version
 
 cd web_socket_support/web_socket_support
 pwd
-echo Installing dependencies
+echo "Installing dependencies"
 if test -d packages; then
   export PATH="$PATH":"$HOME/.pub-cache/bin"
   dart pub global activate melos
   melos bootstrap
 else
   if grep -q "sdk: flutter" pubspec.yaml; then
-    echo "\nFlutter detected: running 'flutter pub get'"
+    echo "Flutter detected: running 'flutter pub get'"
     flutter pub get
   else
-    echo "\nRunning 'dart pub get'"
+    echo "Running 'dart pub get'"
     dart pub get
   fi
 fi
 
 # Obtaining all the packages and their examples (if any)
-echo "\nObtaining all the packages and their examples"
+echo "Obtaining all the packages and their examples"
 PACKAGES=()
 if test -d packages; then
   for PACKAGE in packages/*; do
@@ -31,7 +31,6 @@ if test -d packages; then
     fi
   done
 fi
-echo "PACKAGES=${PACKAGES[*]}"
 
 if test -f pubspec.yaml; then
   PACKAGES+=(.)
@@ -40,13 +39,14 @@ if test -f pubspec.yaml; then
   fi
 fi
 
-echo "\n${#PACKAGES[@]} package found: ${PACKAGES[@]}"
+# print info about packages found
+echo "${#PACKAGES[@]} package found: ${PACKAGES[@]}"
 
-echo "\nRunning code-generators..."
+echo "Running code-generators..."
 for PACKAGE in ${PACKAGES[@]}; do
   cd $PACKAGE
   if grep -q "build_runner:" pubspec.yaml; then
-    echo "\nCode generator detected in $PACKAGE, starting build_runner"
+    echo "Code generator detected in $PACKAGE, starting build_runner"
     if grep -q "sdk: flutter" pubspec.yaml; then
       flutter pub run build_runner build --delete-conflicting-outputs
     else
@@ -56,27 +56,27 @@ for PACKAGE in ${PACKAGES[@]}; do
   cd - > /dev/null
 done
 
-echo "\nChecking format..."
+echo "Checking format..."
 for PACKAGE in ${PACKAGES[@]}; do
-  echo "\nChecking format of $PACKAGE"
+  echo "Checking format of $PACKAGE"
   cd $PACKAGE
   dart format --set-exit-if-changed .
   cd - > /dev/null
 done
 
-echo "\nAnalyzing..."
+echo "Analyzing..."
 for PACKAGE in ${PACKAGES[@]}; do
-  echo "\nAnalyzing $PACKAGE"
+  echo "Analyzing $PACKAGE"
   cd $PACKAGE
   dart analyze .
   cd - > /dev/null
 done
 
-echo "\nTesting..."
+echo "Testing..."
 for PACKAGE in ${PACKAGES[@]}; do
   cd $PACKAGE
   if test -d "test"; then
-    echo "\nTesting $PACKAGE"
+    echo "Testing $PACKAGE"
     if grep -q "sdk: flutter" pubspec.yaml; then
       if [ $1 = "nnbd" ]; then
         flutter test --no-sound-null-safety --no-pub --coverage
@@ -89,13 +89,13 @@ for PACKAGE in ${PACKAGES[@]}; do
       else
         dart test --coverage coverage
       fi
-      echo "test done"
+      echo "Test done"
       ls
       echo "ls coverage"
       ls coverage
       echo "ls coverage/test"
       ls coverage/test
-      echo "obtaining coverage report"
+      echo "Obtaining coverage report"
       dart run coverage:format_coverage -l -i ./coverage/test/*.dart.vm.json -o ./coverage/lcov.info --packages ./.packages
     fi
   fi
@@ -105,13 +105,15 @@ done
 for PACKAGE in ${PACKAGES[@]}; do
   cd $PACKAGE
   if ! grep -q "publish_to:" pubspec.yaml; then
-    echo "dry-run of 'dart pub publish' for $PACKAGE"
+    echo "Running dry-run of 'dart pub publish' for $PACKAGE"
     dart pub publish --dry-run
   fi
   cd - > /dev/null
 done
 
 if [ "${CI}" ]; then
-  echo "uploading code coverage to codecov"
+  echo "Uploading code coverage to codecov"
   curl -s https://codecov.io/bash | bash
+else
+  echo "Uploading code coverage skipped"
 fi
