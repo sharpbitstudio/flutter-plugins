@@ -23,4 +23,4 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Execute build script
-        run: sh .github/scripts/ci.sh
+        run: bash .github/scripts/ci.sh

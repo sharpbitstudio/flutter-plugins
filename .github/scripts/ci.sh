@@ -12,13 +12,16 @@ if test -d packages; then
   melos bootstrap
 else
   if grep -q "sdk: flutter" pubspec.yaml; then
+    echo "\nFlutter detected: running 'flutter pub get'"
     flutter pub get
   else
+    echo "\nRunning 'dart pub get'"
     dart pub get
   fi
 fi
 
 # Obtaining all the packages and their examples (if any)
+echo "\nObtaining all the packages and their examples"
 PACKAGES=()
 if test -d packages; then
   for PACKAGE in packages/*; do
@@ -28,6 +31,7 @@ if test -d packages; then
     fi
   done
 fi
+echo "PACKAGES=${PACKAGES[*]}"
 
 if test -f pubspec.yaml; then
   PACKAGES+=(.)
