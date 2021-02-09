@@ -1,9 +1,12 @@
 set -e # abort CI if an error happens
+set -x # expands variables and prints a little + sign before the line.
 
 flutter doctor
 dart --version
 
 echo Installing dependencies
+cd web_socket_support/web_socket_support
+pwd
 if test -d packages; then
   export PATH="$PATH":"$HOME/.pub-cache/bin"
   dart pub global activate melos
@@ -109,3 +112,5 @@ if [ "${CI}" ]; then
   echo "uploading code coverage to codecov"
   curl -s https://codecov.io/bash | bash
 fi
+
+set +x # disable printing commands
