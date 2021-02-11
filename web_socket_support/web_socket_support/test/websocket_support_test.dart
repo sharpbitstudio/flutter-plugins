@@ -45,8 +45,7 @@ void main() {
 
     test('Valid listener works', () async {
       // verify
-      expect(WebSocketClient(MockWebSocketListener()),
-          isA<WebSocketClient>());
+      expect(WebSocketClient(MockWebSocketListener()), isA<WebSocketClient>());
     });
 
     test('DummyWebSocketListener throws exception', () async {
