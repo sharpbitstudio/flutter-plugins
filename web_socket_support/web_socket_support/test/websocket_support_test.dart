@@ -44,7 +44,6 @@ void main() {
     });
 
     test('DummyWebSocketListener throws exception', () async {
-
       // init
       var mockTextEventChannel = MockEventChannel();
       var mockByteEventChannel = MockEventChannel();
@@ -59,10 +58,12 @@ void main() {
           .thenAnswer((Invocation invoke) => MockBteStreamController());
 
       // verify
-      expect(() async => await _webSocketClient.connect(
-        'ws://example.com/',
-        options: WebSocketOptions(),
-      ), throwsA(isA<PlatformException>()));
+      expect(
+          () async => await _webSocketClient.connect(
+                'ws://example.com/',
+                options: WebSocketOptions(),
+              ),
+          throwsA(isA<PlatformException>()));
     });
 
     test('connect', () async {
