@@ -79,8 +79,10 @@ for PACKAGE in ${PACKAGES[@]}; do
     echo "Testing $PACKAGE"
     if grep -q "sdk: flutter" pubspec.yaml; then
       if [ $1 = "nnbd" ]; then
+	    echo "Running 'flutter test --no-sound-null-safety --no-pub --coverage'..."
         flutter test --no-sound-null-safety --no-pub --coverage
       else
+	    echo "Running 'flutter test --no-pub --coverage'..."
         flutter test --no-pub --coverage
       fi
     else

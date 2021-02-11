@@ -100,10 +100,11 @@ class WebSocketSupport with ChangeNotifier {
   }
 
   void _onError(Exception ex) {
-    print('Fatal error occured: $ex');
+    print('_onError: Fatal error occured: $ex');
+    _webSocketConnection = null;
     working = false;
     _backend.addMesage(
-        ServerMessage('Unable to connect to remote server!', DateTime.now()));
+        ServerMessage('Error occured on WS connection!', DateTime.now()));
     notifyListeners();
   }
 

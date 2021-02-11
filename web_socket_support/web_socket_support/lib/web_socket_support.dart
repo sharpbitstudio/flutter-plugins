@@ -39,9 +39,10 @@ class WebSocketClient extends WebSocketSupportPlatform {
   @override
   Future<void> connect(String serverUrl,
       {WebSocketOptions options = const WebSocketOptions()}) async {
-    assert(serverUrl != null);
-    assert(options != null);
-    if (WebSocketSupportPlatform.instance is DummyWebSocketListener) {
+    assertNotNull(serverUrl);
+    assertNotNull(options);
+    if ((WebSocketSupportPlatform.instance as MethodChannelWebSocketSupport)
+        .listener is DummyWebSocketListener) {
       throw PlatformException(
         code: 'WRONG_WS_LISTENER',
         message: 'Client must supply specific WebSocketListener implementation'
@@ -65,6 +66,10 @@ class WebSocketClient extends WebSocketSupportPlatform {
       code: code,
       reason: reason,
     );
+  }
+
+  void assertNotNull(Object object) {
+    assert(object != null);
   }
 }
 
