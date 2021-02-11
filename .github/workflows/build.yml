@@ -15,12 +15,12 @@ jobs:
     strategy:
       matrix:
         channel:
-          - dev
-          - beta
+          # - dev
+          # - beta
           - stable
 
     steps:
       - uses: actions/checkout@v2
 
       - name: Execute build script
-        run: curl -s https://raw.githubusercontent.com/sharpbitstudio/flutter-plugins/master/.github/scripts/ci.sh | bash
+        run: bash .github/scripts/ci.sh
