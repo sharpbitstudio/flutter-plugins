@@ -43,6 +43,12 @@ void main() {
           isNot(isA<DummyWebSocketListener>()));
     });
 
+    test('Valid listener works', () async {
+      // verify
+      expect(WebSocketClient(MockWebSocketListener()),
+          isA<WebSocketClient>());
+    });
+
     test('DummyWebSocketListener throws exception', () async {
       // verify
       expect(() => WebSocketClient(MockDummyWebSocketListener()),
