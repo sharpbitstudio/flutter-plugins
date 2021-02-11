@@ -44,25 +44,8 @@ void main() {
     });
 
     test('DummyWebSocketListener throws exception', () async {
-      // init
-      var mockTextEventChannel = MockEventChannel();
-      var mockByteEventChannel = MockEventChannel();
-      _webSocketClient = WebSocketClient.private(
-          MethodChannelWebSocketSupport.private(MockDummyWebSocketListener(),
-              MockMethodChannel(), mockTextEventChannel, mockByteEventChannel));
-
-      // mock
-      when(mockTextEventChannel.receiveBroadcastStream())
-          .thenAnswer((Invocation invoke) => MockTextStreamController());
-      when(mockByteEventChannel.receiveBroadcastStream())
-          .thenAnswer((Invocation invoke) => MockBteStreamController());
-
       // verify
-      expect(
-          () async => await _webSocketClient.connect(
-                'ws://example.com/',
-                options: WebSocketOptions(),
-              ),
+      expect(() => WebSocketClient(MockDummyWebSocketListener()),
           throwsA(isA<PlatformException>()));
     });
 
@@ -74,8 +57,16 @@ void main() {
       // verify
       verify(_mockedWebSocket.connect('ws://example.com/',
           options: anyNamed('options')));
-      verify(_mockedWebSocket.listener);
       verifyNoMoreInteractions(_mockedWebSocket);
+    });
+
+    test('invalid connect', () async {
+      expect(
+          () => _webSocketClient.connect(
+                'ws://example.com/',
+                options: null,
+              ),
+          throwsA(isA<AssertionError>()));
     });
 
     test('disconnect', () async {
@@ -331,6 +322,34 @@ void main() {
       expect(_exception, exception);
     });
 
+    test('DefaultWebSocketListener default positional parameters', () {
+      // init listener
+      _listener = DefaultWebSocketListener(
+        (wsc) => _webSocketConnection = wsc,
+        (code, reason) => {
+          _closedCode = code,
+          _closedReason = reason,
+        },
+      );
+
+      // test on closing
+      var closingCode = 123;
+      var closingReason = 'closing reason 1';
+      _listener.onWsClosing(closingCode, closingReason);
+
+      // test onTextMessage
+      var textMsg = 'text message 1';
+      _listener.onTextMessage(textMsg);
+
+      // test onByteMessage
+      var byteMsg = utf8.encode('text message 1');
+      _listener.onByteMessage(byteMsg);
+
+      // test onError
+      var exception = Exception('exception 1');
+      _listener.onError(exception);
+    });
+
     test('DefaultWebSocketListener forTextMessages constructor', () {
       // init listener
       _listener = DefaultWebSocketListener.forTextMessages(
@@ -364,6 +383,10 @@ void main() {
 
       // verify
       expect(_textMsg, textMsg);
+
+      // test onByteMessage
+      expect(() => _listener.onByteMessage(utf8.encode('byte message 2')),
+          throwsA(isA<UnsupportedError>()));
     });
 
     test('DefaultWebSocketListener forByteMessages constructor', () {
@@ -399,6 +422,10 @@ void main() {
 
       // verify
       expect(_byteMsg, byteMsg);
+
+      // test onTextMessage
+      expect(() => _listener.onTextMessage('text message 3'),
+          throwsA(isA<UnsupportedError>()));
     });
   });
 }
