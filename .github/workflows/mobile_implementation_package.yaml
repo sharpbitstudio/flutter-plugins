@@ -11,9 +11,6 @@ on:
     branches: [ master ]
     paths:
     - 'web_socket_support/web_socket_support/**'
-  # schedule:
-    # runs the CI every 1st day in month at 10AM
-    # - cron: "0 10 1 * *"
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -33,7 +30,7 @@ jobs:
       # Make sure the stable version of Flutter is available
       - uses: subosito/flutter-action@v1
         with:
-        channel: 'stable' # or: 'beta' or 'dev'
+          channel: 'stable' # or: 'beta' or 'dev'
 
       # Download all Flutter packages the web_socket_support depends on
       - name: Download dependencies
