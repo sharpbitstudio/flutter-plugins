@@ -11,7 +11,7 @@ on:
     branches: [ master ]
     paths:
     - 'web_socket_support/web_socket_support/**'
-  schedule:
+  # schedule:
     # runs the CI every 1st day in month at 10AM
     # - cron: "0 10 1 * *"
 
@@ -61,9 +61,9 @@ jobs:
         working-directory: ${{env.example-directory}}
 
       # Build iOS version of the example app
-      - name: Run iOS build
-        run: flutter build ios --release --no-codesign
-        working-directory: ${{env.example-directory}}
+      # - name: Run iOS build
+      #  run: flutter build ios --release --no-codesign
+      #  working-directory: ${{env.example-directory}}
 
       # Upload code coverage information
       - uses: codecov/codecov-action@v1
