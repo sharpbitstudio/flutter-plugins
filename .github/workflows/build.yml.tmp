@@ -1,0 +1,38 @@
+name: Build
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+  schedule:
+    # runs the CI every 1st day in month at 10AM
+    - cron: "0 10 1 * *"
+
+jobs:
+  flutter:
+    runs-on: ubuntu-latest
+    container: cirrusci/flutter:${{matrix.channel}}
+
+    strategy:
+      matrix:
+        channel:
+          # - dev
+          # - beta
+          - stable
+
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v2
+
+      - name: Execute build script
+        run: bash .github/scripts/ci.sh
+  android:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v2
+      - name: Build the app
+        run: ./web_socket_support/web_socket_support/android/gradlew build
