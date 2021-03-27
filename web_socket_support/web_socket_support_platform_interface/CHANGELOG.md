@@ -1,3 +1,7 @@
+## 0.1.6
+
+* Updated dependencies after Flutter 2.0 release.
+
 ## 0.1.5
 
 * API minor fix.
