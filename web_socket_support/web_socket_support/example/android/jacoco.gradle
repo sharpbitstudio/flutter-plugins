@@ -47,7 +47,7 @@ def setupAndroidReporting() {
     ) {
         reports {
             csv.enabled false
-            xml.enabled false
+            xml.enabled true
             html {
                 enabled true
                 destination file("${buildDir}/coverage-report")
@@ -84,4 +84,8 @@ def setupAndroidReporting() {
             ]
         )
     }
+
+    // add jacoco tests on assembleRelease
+    // this is used for android coverage in github actions
+    tasks.assembleRelease.dependsOn jacocoTestReport
 }
