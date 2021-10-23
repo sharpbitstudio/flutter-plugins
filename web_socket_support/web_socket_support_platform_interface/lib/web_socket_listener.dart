@@ -22,10 +22,10 @@ abstract class WebSocketListener {
   void onWsClosed(int code, String reason);
 
   /// Invoked when a text (type `0x1`) message has been received.
-  void onTextMessage(String message);
+  void onStringMessage(String message);
 
   /// Invoked when a binary (type `0x2`) message has been received.
-  void onByteMessage(Uint8List message);
+  void onByteArrayMessage(Uint8List message);
 
   /// Invoked when error occurs in transport between dart and platform.
   void onError(Exception exception);

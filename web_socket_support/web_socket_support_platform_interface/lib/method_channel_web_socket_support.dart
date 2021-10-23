@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
@@ -10,28 +11,70 @@ import 'package:web_socket_support_platform_interface/web_socket_support_platfor
 
 class MethodChannelWebSocketSupport extends WebSocketSupportPlatform {
   //
+  // constants
+  static const methodChannelName =
+      'tech.sharpbitstudio.web_socket_support/methods';
+  static const textEventChannelName =
+      'tech.sharpbitstudio.web_socket_support/text-messages';
+  static const byteEventChannelName =
+      'tech.sharpbitstudio.web_socket_support/binary-messages';
+
+  //
   // locals
   final WebSocketListener _listener;
   final MethodChannel _methodChannel;
-  final EventChannel _textMessages;
-  final EventChannel _byteMessages;
+  final EventChannel _textMessagesChannel;
+  final EventChannel _byteMessagesChannel;
+
+  // stream subscriptions
+  StreamSubscription? _textStreamSubscription;
+  StreamSubscription? _binaryStreamSubscription;
 
   MethodChannelWebSocketSupport(this._listener)
-      : _methodChannel = MethodChannel(
-          'tech.sharpbitstudio.web_socket_support/methods',
-        ),
-        _textMessages = EventChannel(
-          'tech.sharpbitstudio.web_socket_support/text-messages',
-        ),
-        _byteMessages = EventChannel(
-          'tech.sharpbitstudio.web_socket_support/binary-messages',
-        );
+      : _methodChannel = MethodChannel(methodChannelName),
+        _textMessagesChannel = EventChannel(textEventChannelName),
+        _byteMessagesChannel = EventChannel(byteEventChannelName) {
+    // set method channel listener
+    _methodChannel.setMethodCallHandler((MethodCall call) {
+      switch (call.method) {
+        case 'onOpened':
+          // ws established
+          _listener.onWsOpened(DefaultWebSocketConnection(_methodChannel));
+          _addStreamEventListeners();
+          break;
+        case 'onClosing':
+          var args = call.arguments as Map;
+          _listener.onWsClosing(args['code'], args['reason']);
+          break;
+        case 'onClosed':
+          // ws closed
+          var args = call.arguments as Map;
+          _listener.onWsClosed(args['code'], args['reason']);
+          _removeStreamEventListeners();
+          break;
+        case 'onFailure':
+          var args = call.arguments as Map;
+          _listener.onError(WebSocketException(args['throwableType'],
+              args['errorMessage'], args['causeMessage']));
+          break;
+        case 'onStringMessage':
+          _listener.onStringMessage(call.arguments as String);
+          break;
+        case 'onByteArrayMessage':
+          _listener.onByteArrayMessage(call.arguments as Uint8List);
+          break;
+        default:
+          print('Unexpected method name: ${call.method}');
+      }
+      return Future.value(null);
+    });
+  }
 
   /// This constructor is only used for testing and shouldn't be accessed by
   /// users of the plugin. It may break or change at any time.
   @visibleForTesting
   MethodChannelWebSocketSupport.private(this._listener, this._methodChannel,
-      this._textMessages, this._byteMessages);
+      this._textMessagesChannel, this._byteMessagesChannel);
 
   /// obtain WebSocketListener implementation
   @visibleForTesting
@@ -40,47 +83,8 @@ class MethodChannelWebSocketSupport extends WebSocketSupportPlatform {
   @override
   Future<void> connect(
     String serverUrl, {
-    @required WebSocketOptions options,
+    WebSocketOptions options = const WebSocketOptions(),
   }) {
-    // method listener
-    _methodChannel.setMethodCallHandler((MethodCall call) {
-      switch (call.method) {
-        case 'onOpened':
-          _listener.onWsOpened(DefaultWebSocketConnection(_methodChannel));
-          break;
-        case 'onClosing':
-          var args = call.arguments as Map;
-          _listener.onWsClosing(args['code'], args['reason']);
-          break;
-        case 'onClosed':
-          var args = call.arguments as Map;
-          _listener.onWsClosed(args['code'], args['reason']);
-          break;
-        case 'onFailure':
-          var args = call.arguments as Map;
-          _listener.onError(WebSocketException(args['throwableType'],
-              args['errorMessage'], args['causeMessage']));
-          break;
-        default:
-          print('Unexpected method name: ${call.method}');
-      }
-      return;
-    });
-
-    // text message listener
-    _textMessages.receiveBroadcastStream().listen((message) {
-      _listener.onTextMessage(message as String);
-    }, onError: (e) {
-      _listener.onError(e);
-    });
-
-    // byte messages listener
-    _byteMessages.receiveBroadcastStream().listen((message) {
-      _listener.onByteMessage(message as Uint8List);
-    }, onError: (e) {
-      _listener.onError(e);
-    });
-
     // connect to server
     return _methodChannel.invokeMethod<void>(
       'connect',
@@ -100,5 +104,33 @@ class MethodChannelWebSocketSupport extends WebSocketSupportPlatform {
         'reason': reason,
       },
     );
+  }
+
+  void _addStreamEventListeners() {
+    // add text message listener
+    _textStreamSubscription =
+        _textMessagesChannel.receiveBroadcastStream().listen((message) {
+      _listener.onStringMessage(message as String);
+    }, onError: (e) {
+      _listener.onError(e);
+    });
+
+    // add byte messages listener
+    _binaryStreamSubscription =
+        _byteMessagesChannel.receiveBroadcastStream().listen((message) {
+      _listener.onByteArrayMessage(message as Uint8List);
+    }, onError: (e) {
+      _listener.onError(e);
+    });
+  }
+
+  void _removeStreamEventListeners() {
+    // remove text message listener
+    _textStreamSubscription!.cancel();
+    _textStreamSubscription = null;
+
+    // remove byte messages listener
+    _binaryStreamSubscription!.cancel();
+    _binaryStreamSubscription = null;
   }
 }

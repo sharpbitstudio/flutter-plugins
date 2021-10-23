@@ -1,3 +1,7 @@
+## 0.2.0
+
+* Moved to null safety. Min SDK is 2.14.0
+
 ## 0.1.6
 
 * Updated dependencies after Flutter 2.0 release.
