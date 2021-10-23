@@ -9,14 +9,14 @@ import 'package:web_socket_support_platform_interface/web_socket_listener.dart';
 import 'package:web_socket_support_platform_interface/web_socket_options.dart';
 import 'package:web_socket_support_platform_interface/web_socket_support_platform_interface.dart';
 
+export 'package:web_socket_support_platform_interface/web_scoket_exception.dart'
+    show WebSocketException;
+export 'package:web_socket_support_platform_interface/web_socket_connection.dart'
+    show WebSocketConnection;
 // Export necessary Classes from the platform_interface and this implementation
 // so plugin users can use them directly.
 export 'package:web_socket_support_platform_interface/web_socket_listener.dart'
     show WebSocketListener;
-export 'package:web_socket_support_platform_interface/web_socket_connection.dart'
-    show WebSocketConnection;
-export 'package:web_socket_support_platform_interface/web_scoket_exception.dart'
-    show WebSocketException;
 
 class WebSocketClient extends WebSocketSupportPlatform {
   /// constructor
@@ -29,6 +29,7 @@ class WebSocketClient extends WebSocketSupportPlatform {
             ' which is not DummyWebSocketListener.',
       );
     }
+    // init correct platform isntance
     WebSocketSupportPlatform.instance = MethodChannelWebSocketSupport(listener);
   }
 

@@ -286,7 +286,7 @@ void main() {
       await _testWsListener.destroy();
     });
 
-    test('Receive event from platform on textEventChannel', () async {
+    test('Receive event from platform via textEventChannel', () async {
       final _testWsListener = TestWebSocketListener();
       MethodChannelWebSocketSupport(_testWsListener);
 
@@ -316,7 +316,44 @@ void main() {
       await _testWsListener.destroy();
     });
 
-    test('Receive event from platform on byteEventChannel', () async {
+    test('Receive error event from platform via textEventChannel', () async {
+      final _testWsListener = TestWebSocketListener();
+      MethodChannelWebSocketSupport(_testWsListener);
+
+      // prepare
+      // text message channel mock (before we is opened)
+      final _streamController = StreamController<String>.broadcast();
+      EventChannelMock(
+        channelName: MethodChannelWebSocketSupport.textEventChannelName,
+        stream: _streamController.stream,
+      );
+
+      // open ws
+      await _sendMessageFromPlatform(
+          MethodChannelWebSocketSupport.methodChannelName,
+          MethodCall('onOpened'));
+
+      // action
+      // emit test error event
+      _streamController.addError(
+        PlatformException(
+            code: 'ERROR_CODE_3', message: 'errMsg3', details: null),
+      );
+
+      // verify
+      expect(_testWsListener.webSocketConnection, isNotNull);
+
+      await _testWsListener.errorCompleter.future.timeout(Duration(seconds: 1));
+      expect(_testWsListener.onErrorCalled, true);
+      expect(_testWsListener.exception, isInstanceOf<PlatformException>());
+      expect(_testWsListener.exception.toString(),
+          'PlatformException(ERROR_CODE_3, errMsg3, null, null)');
+
+      // clean up
+      await _testWsListener.destroy();
+    });
+
+    test('Receive event from platform via byteEventChannel', () async {
       final _testWsListener = TestWebSocketListener();
       MethodChannelWebSocketSupport(_testWsListener);
 
@@ -346,7 +383,44 @@ void main() {
       await _testWsListener.destroy();
     });
 
-    test('Receive `onStringMessage` event after ws is established', () async {
+    test('Receive error event from platform via byteEventChannel', () async {
+      final _testWsListener = TestWebSocketListener();
+      MethodChannelWebSocketSupport(_testWsListener);
+
+      // prepare
+      // text message channel mock (before we is opened)
+      final _streamController = StreamController<Uint8List>.broadcast();
+      EventChannelMock(
+        channelName: MethodChannelWebSocketSupport.byteEventChannelName,
+        stream: _streamController.stream,
+      );
+
+      // open ws
+      await _sendMessageFromPlatform(
+          MethodChannelWebSocketSupport.methodChannelName,
+          MethodCall('onOpened'));
+
+      // action
+      // emit error test event
+      _streamController.addError(
+        PlatformException(
+            code: 'ERROR_CODE_4', message: 'errMsg4', details: null),
+      );
+
+      // verify
+      expect(_testWsListener.webSocketConnection, isNotNull);
+
+      await _testWsListener.errorCompleter.future.timeout(Duration(seconds: 1));
+      expect(_testWsListener.onErrorCalled, true);
+      expect(_testWsListener.exception, isInstanceOf<PlatformException>());
+      expect(_testWsListener.exception.toString(),
+          'PlatformException(ERROR_CODE_4, errMsg4, null, null)');
+
+      // clean up
+      await _testWsListener.destroy();
+    });
+
+    test('Receive `onStringMessage` event via MethodChannel', () async {
       final _testWsListener = TestWebSocketListener();
       MethodChannelWebSocketSupport(_testWsListener);
 
@@ -370,8 +444,7 @@ void main() {
       await _testWsListener.destroy();
     });
 
-    test('Receive `onByteArrayMessage` event after ws is established',
-        () async {
+    test('Receive `onByteArrayMessage` event via MethodChannel', () async {
       final _testWsListener = TestWebSocketListener();
       MethodChannelWebSocketSupport(_testWsListener);
 

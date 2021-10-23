@@ -65,31 +65,37 @@ class DummyWebSocketListener extends WebSocketListener {
 
   @override
   void onByteArrayMessage(Uint8List message) {
-    print('Byte message received. Size: ${message.length}');
+    throw UnimplementedError(
+        'onByteArrayMessage(Uint8List message) has not been implemented.');
   }
 
   @override
   void onError(Exception exception) {
-    print('Platform exception occurred: $exception');
+    throw UnimplementedError(
+        'onError(Exception exception) has not been implemented.');
   }
 
   @override
   void onStringMessage(String message) {
-    print('Text message received. Content: $message');
+    throw UnimplementedError(
+        'onStringMessage(String message) has not been implemented.');
   }
 
   @override
   void onWsClosed(int code, String reason) {
-    print('WebSocket connection closed. Code:$code, Reason:$reason:');
+    throw UnimplementedError(
+        'onWsClosed(int code, String reason) has not been implemented.');
   }
 
   @override
   void onWsClosing(int code, String reason) {
-    print('WebSocket connection is closing. Code:$code, Reason:$reason:');
+    throw UnimplementedError(
+        'onWsClosing(int code, String reason) has not been implemented.');
   }
 
   @override
   void onWsOpened(WebSocketConnection webSocketConnection) {
-    print('WebSocket connection opened. Ws:$webSocketConnection');
+    throw UnimplementedError(
+        'onWsOpened(WebSocketConnection webSocketConnection) has not been implemented.');
   }
 }

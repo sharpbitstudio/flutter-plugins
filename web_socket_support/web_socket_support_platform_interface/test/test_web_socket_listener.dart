@@ -14,6 +14,7 @@ class TestWebSocketListener extends WebSocketListener {
   bool onClosingCalled = false;
   bool onClosedCalled = false;
   bool onErrorCalled = false;
+  final errorCompleter = Completer();
   int? closingCode;
   String? closingReason;
   Exception? exception;
@@ -60,6 +61,7 @@ class TestWebSocketListener extends WebSocketListener {
   void onError(Exception e) {
     onErrorCalled = true;
     exception = e;
+    errorCompleter.complete();
   }
 
   Future<void> destroy() async {

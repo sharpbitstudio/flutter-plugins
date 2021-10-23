@@ -1,7 +1,10 @@
+import 'dart:typed_data';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'package:web_socket_support_platform_interface/method_channel_web_socket_support.dart';
+import 'package:web_socket_support_platform_interface/web_socket_connection.dart';
 import 'package:web_socket_support_platform_interface/web_socket_listener.dart';
 import 'package:web_socket_support_platform_interface/web_socket_support_platform_interface.dart';
 
@@ -21,6 +24,53 @@ void main() {
         WebSocketSupportPlatform.instance =
             ImplementsWebSocketSupportPlatform();
       }, throwsA(isInstanceOf<AssertionError>()));
+    });
+
+    test(
+        '$MethodChannelWebSocketSupport dummy listener throws exception on any call',
+        () {
+      expect(
+        () =>
+            (WebSocketSupportPlatform.instance as MethodChannelWebSocketSupport)
+                .listener
+                .onByteArrayMessage(Uint8List.fromList(List.empty())),
+        throwsUnimplementedError,
+      );
+      expect(
+        () =>
+            (WebSocketSupportPlatform.instance as MethodChannelWebSocketSupport)
+                .listener
+                .onError(Exception()),
+        throwsUnimplementedError,
+      );
+      expect(
+        () =>
+            (WebSocketSupportPlatform.instance as MethodChannelWebSocketSupport)
+                .listener
+                .onStringMessage(''),
+        throwsUnimplementedError,
+      );
+      expect(
+        () =>
+            (WebSocketSupportPlatform.instance as MethodChannelWebSocketSupport)
+                .listener
+                .onWsClosed(1, ''),
+        throwsUnimplementedError,
+      );
+      expect(
+        () =>
+            (WebSocketSupportPlatform.instance as MethodChannelWebSocketSupport)
+                .listener
+                .onWsClosing(1, ''),
+        throwsUnimplementedError,
+      );
+      expect(
+        () =>
+            (WebSocketSupportPlatform.instance as MethodChannelWebSocketSupport)
+                .listener
+                .onWsOpened(WebSocketConnectionMock()),
+        throwsUnimplementedError,
+      );
     });
 
     test('Can be mocked with `implements`', () {
@@ -61,6 +111,8 @@ void main() {
     });
   });
 }
+
+class WebSocketConnectionMock extends Mock implements WebSocketConnection {}
 
 class WebSocketSupportPlatformMock extends Mock
     with MockPlatformInterfaceMixin
