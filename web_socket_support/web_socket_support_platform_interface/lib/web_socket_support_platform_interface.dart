@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:meta/meta.dart' show required;
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'package:web_socket_support_platform_interface/method_channel_web_socket_support.dart';
 import 'package:web_socket_support_platform_interface/web_socket_connection.dart';
@@ -15,7 +14,7 @@ import 'package:web_socket_support_platform_interface/web_socket_options.dart';
 /// (using `extends`) ensures that the subclass will get the default implementation, while
 /// platform implementations that `implements` this interface will be broken by newly added
 /// [WebSocketSupportPlatform] methods.
-class WebSocketSupportPlatform extends PlatformInterface {
+abstract class WebSocketSupportPlatform extends PlatformInterface {
   ///
   /// Constructs a WebSocketSupportPlatform.
   WebSocketSupportPlatform() : super(token: _token);
@@ -42,7 +41,7 @@ class WebSocketSupportPlatform extends PlatformInterface {
   /// If connection was successful, [onWsOpened] will be invoked.
   Future<void> connect(
     String serverUrl, {
-    @required WebSocketOptions options,
+    WebSocketOptions options = const WebSocketOptions(),
   }) {
     throw UnimplementedError('connect() has not been implemented.');
   }
@@ -65,32 +64,38 @@ class DummyWebSocketListener extends WebSocketListener {
   DummyWebSocketListener._();
 
   @override
-  void onByteMessage(Uint8List message) {
-    print('Byte message received. Size: ${message.length}');
+  void onByteArrayMessage(Uint8List message) {
+    throw UnimplementedError(
+        'onByteArrayMessage(Uint8List message) has not been implemented.');
   }
 
   @override
   void onError(Exception exception) {
-    print('Platform exception occurred: $exception');
+    throw UnimplementedError(
+        'onError(Exception exception) has not been implemented.');
   }
 
   @override
-  void onTextMessage(String message) {
-    print('Text message received. Content: $message');
+  void onStringMessage(String message) {
+    throw UnimplementedError(
+        'onStringMessage(String message) has not been implemented.');
   }
 
   @override
   void onWsClosed(int code, String reason) {
-    print('WebSocket connection closed. Code:$code, Reason:$reason:');
+    throw UnimplementedError(
+        'onWsClosed(int code, String reason) has not been implemented.');
   }
 
   @override
   void onWsClosing(int code, String reason) {
-    print('WebSocket connection is closing. Code:$code, Reason:$reason:');
+    throw UnimplementedError(
+        'onWsClosing(int code, String reason) has not been implemented.');
   }
 
   @override
   void onWsOpened(WebSocketConnection webSocketConnection) {
-    print('WebSocket connection opened. Ws:$webSocketConnection');
+    throw UnimplementedError(
+        'onWsOpened(WebSocketConnection webSocketConnection) has not been implemented.');
   }
 }

@@ -6,10 +6,10 @@ import 'package:flutter/services.dart';
 /// WebSocket connection initialized by [connect] call.
 abstract class WebSocketConnection {
   /// Call this method when you want to send Text message to server.
-  Future<bool> sendTextMessage(String message);
+  Future<bool?> sendStringMessage(String message);
 
   /// Call this method when you want to send Byte message to server.
-  Future<bool> sendByteMessage(Uint8List message);
+  Future<bool?> sendByteArrayMessage(Uint8List message);
 }
 
 class DefaultWebSocketConnection implements WebSocketConnection {
@@ -18,16 +18,13 @@ class DefaultWebSocketConnection implements WebSocketConnection {
   DefaultWebSocketConnection(this._methodChannel);
 
   @override
-  Future<bool> sendByteMessage(Uint8List message) {
-    return _methodChannel.invokeMethod('sendByteMessage', {
-      'byteMessage': message,
-    });
+  Future<bool?> sendStringMessage(String stringMessage) {
+    return _methodChannel.invokeMethod('sendStringMessage', stringMessage);
   }
 
   @override
-  Future<bool> sendTextMessage(String message) {
-    return _methodChannel.invokeMethod('sendTextMessage', {
-      'textMessage': message,
-    });
+  Future<bool?> sendByteArrayMessage(Uint8List byteArrayMessage) {
+    return _methodChannel.invokeMethod(
+        'sendByteArrayMessage', byteArrayMessage);
   }
 }

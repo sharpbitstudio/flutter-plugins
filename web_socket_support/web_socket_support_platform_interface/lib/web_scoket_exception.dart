@@ -1,6 +1,4 @@
-import 'dart:io';
-
-class WebSocketException implements IOException {
+class WebSocketException implements Exception {
   final String originType;
   final String message;
   final String causeMessage;
